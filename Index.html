@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Digital Receipt System</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- DOMPurify CDN for input sanitization -->
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Digital Receipt System</h1>
+
+    <form id="receiptForm" novalidate>
+      <div class="form-group">
+        <label for="salesData">Sales Data</label>
+        <input type="text" id="salesData" name="salesData" placeholder="Enter sales data" required />
+      </div>
+
+      <div class="form-group">
+        <label for="receiptNumber">Receipt Number</label>
+        <input type="text" id="receiptNumber" name="receiptNumber" placeholder="Enter receipt number" required />
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" rows="4" placeholder="Enter description" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="paymentMethod">Payment Method</label>
+        <select id="paymentMethod" name="paymentMethod" required>
+          <option value="">Select...</option>
+          <option value="Cash">Cash</option>
+          <option value="Card">Card</option>
+          <option value="Online Payment">Online Payment</option>
+        </select>
+      </div>
+
+      <button type="submit">Generate Receipt</button>
+    </form>
+
+    <section id="receiptDisplay" class="receipt-display"></section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+{
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f7f9fb;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.container {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  width: 100%;
+  max-width: 600px;
+  animation: fadeIn 0.4s ease-in;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #007bff;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+button {
+  width: 100%;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.receipt-display {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  display: none;
+}
+
+.receipt-display h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.receipt-display p {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 1.5rem;
+  }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('receiptForm');
+  const receiptDisplay = document.getElementById('receiptDisplay');
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    // Collect and sanitize inputs
+    const salesData = DOMPurify.sanitize(document.getElementById('salesData').value.trim());
+    const receiptNumber = DOMPurify.sanitize(document.getElementById('receiptNumber').value.trim());
+    const description = DOMPurify.sanitize(document.getElementById('description').value.trim());
+    const paymentMethod = DOMPurify.sanitize(document.getElementById('paymentMethod').value.trim());
+
+    // Validate required fields
+    if (!salesData || !receiptNumber || !description || !paymentMethod) {
+      alert('⚠️ Please fill in all required fields.');
+      return;
+    }
+
+    // Create formatted receipt HTML
+    const receiptHTML = `
+      <h2>Receipt Details</h2>
+      <p><strong>Sales Data:</strong> ${salesData}</p>
+      <p><strong>Receipt Number:</strong> ${receiptNumber}</p>
+      <p><strong>Description:</strong> ${description}</p>
+      <p><strong>Payment Method:</strong> ${paymentMethod}</p>
+      <hr />
+      <p><em>Generated on: ${new Date().toLocaleString()}</em></p>
+    `;
+
+    // Display sanitized data
+    receiptDisplay.innerHTML = receiptHTML;
+    receiptDisplay.style.display = 'block';
+
+    // Reset the form
+    form.reset();
+  });
+});
